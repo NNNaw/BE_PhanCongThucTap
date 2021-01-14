@@ -305,6 +305,7 @@ module.exports.addTopic = async function (req, res) {
                     }).catch(err => {
                         res.status(415).send("Thêm công việc thất bại!!!");
                     });
+                    
             })
 
         } catch (error) {
