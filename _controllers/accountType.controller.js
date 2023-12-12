@@ -10,7 +10,7 @@ module.exports.GetAllAccountTypes = async function (req, res) {
         console.log("nam")
 
         let pool = await sql.connect(config);
-        let accounttypes = await pool.request().query("SELECT * from tbl_TypeAccount");
+        let accounttypes = await pool.request().query("SELECT * from loaiTaiKhoan");
         res.json(accounttypes.recordset);
 
     } catch (error) {

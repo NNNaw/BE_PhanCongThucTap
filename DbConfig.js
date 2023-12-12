@@ -9,7 +9,8 @@ const config = {
         enableArithAbort: true,
         instancename: 'NAM'
     },
-    port: 1433
+    port: 1434
+
 }
 
 module.exports = config; 

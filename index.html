@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+
+    <script type="text/javascript">
+
+
+// 1
+//         setTimeout(myFunction, 3000); 
+
+//         function myFunction() {
+//             document.getElementById("demo").innerHTML = "I love You !!";
+//         }
+
+// // 2  -- tại sao khi dùng callback có tham số thì phải có anonymous function bao ở ngoài ??
+//         setTimeout(function () { myFunction("I love You !!!"); }, 3000);
+
+//         function myFunction(value) {
+//             document.getElementById("demo").innerHTML = value;
+//         }
+
+// let hocVien = {
+//     hoTen : 'Nguyen Nhat Nam',
+//     lop : '17cb',
+//     laythongtin : function(){
+//         function hienThi(){
+//             console.log(`Họ Tên : ${this.hoten}`)
+//         }
+//         hienThi();
+//     }
+// }
+
+function print(foo){
+   console.log("1");
+}
+
+const greet = (who) => {
+  return `Hello, ${who}!`;
+}
+
+const xx = greet('xx');
+console.log(xx())
+
+
+    </script>
+</body>
+
+</html>

@@ -12,8 +12,8 @@ const storage = multer.diskStorage({
 
 // validate format file upload
 function checkFileType(file, cb) {
+    
     // Allowed ext
-
     const filetypes = /zip|rar/;
     // Check ext
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
@@ -21,9 +21,12 @@ function checkFileType(file, cb) {
     const mimetype = filetypes.test(file.mimetype);
 
     if (mimetype && extname) {
+        console.log("extname: ", extname);
+        console.log("mimetype: ", mimetype);
+
         return cb(null, true);
     } else {
-        cb('Error: File RAR or ZIP Only!');
+       cb('Error: File RAR or ZIP Only!');
     }
 }
 
@@ -34,12 +37,31 @@ const upload = multer({
     // fileFilter: function (req, file, cb) {
     //     checkFileType(file, cb);
     // }
-});
+}).single('file');
 
 
+const checkContentFileUploads = (req, res, next) => {
+
+   
+    upload(req, res, (err) => {
+
+        if (err instanceof multer.MulterError) {
+
+            return res.status(418).send("File quá lớn");
+        } else {
+            console.log(req.file);
+            if (req.file == undefined || req.file == null) {
+                res.status(400).send('(*)CHÚ Ý : Chỉ nhận file *.ZIP or *.ZAR !!!');
+            } else {
+                next();
+            }
+        }
+    });
+}
 
 module.exports = {
-    upload
+    upload,
+    checkContentFileUploads
 };
 
 

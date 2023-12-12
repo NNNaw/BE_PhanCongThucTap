@@ -1,6 +1,6 @@
 var express = require('express')
 var router = express.Router()
-const { upload } = require('./../multer')
+const { upload, checkContentFileUploads } = require('./../multer')
 
 const controller = require('./../_controllers/student.controller');
 
@@ -17,7 +17,7 @@ router.get('/getAssignmenStudentNotDone/:idGV/:idSV', controller.getAssignmenStu
 
 router.post('/registerTopic', controller.registerTopic)
 
-router.post('/submitFile', upload.single('file'), controller.submitFile)
+router.post('/submitFile',checkContentFileUploads, controller.submitFile)
 
 router.get('/downloadFile/:filePath', controller.downloadFile)
 

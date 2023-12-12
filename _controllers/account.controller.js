@@ -5,12 +5,47 @@ const sql = require('mssql');
 module.exports.getAccounts = async function (req, res) {
     try {
         let pool = await sql.connect(config);
-        let accounts = await pool.request().query("SELECT * from TaiKhoan");
+        let accounts = await pool.request().query(`select taiKhoan,ngayLap,ngayDuyet,tinhTrang, tenLoai from TaiKhoan tk ,LoaiTaiKhoan ltk
+        where tk.idLoai = ltk.idLoai `);
         res.json(accounts.recordset);
     }
     catch (error) {
         console.log(error);
     }
+}
+module.exports.getAccountsConfirmed = async function (req, res) {
+    try {
+        let pool = await sql.connect(config);
+        let accounts = await pool.request().query(`exec layChiTiet_DSHocSinhDaPhanCong`);
+        res.json(accounts.recordset);
+    }
+    catch (error) {
+        console.log(error);
+    }
+}
+
+
+module.exports.getAccountsUnconfirm = async function (req, res) {
+    try {
+        let pool = await sql.connect(config);
+        let accounts = await pool.request().query(`exec layChiTiet_DSHocSinhChoDuyet`);
+        res.json(accounts.recordset);
+    }
+    catch (error) {
+        console.log(error);
+    }
+}
+
+module.exports.getDetailListStudentWaitingAssignment = async function (req, res) {
+
+    try {
+        let pool = await sql.connect(config);
+        let lst = await pool.request().query(`exec layChiTiet_DSHocSinhChuaPhanCong`);
+        res.json(lst.recordset);
+    } catch (error) {
+
+    }
+
 }
 
 
@@ -56,6 +91,7 @@ module.exports.Register = async function (req, res) {
 module.exports.Login = async function (req, res) {
 
     try {
+        console.log(req.body);
         let pool = await sql.connect(config);
 
 
@@ -121,10 +157,18 @@ module.exports.Login = async function (req, res) {
                     }
 
                     break;
+                case "Admin":
+                    userDetail = {
+                        idLoaiTaiKhoan: accountType.recordset[0].idLoai,
+                        tenLoaiTaiKhoan: accountType.recordset[0].tenLoai,
+                        taiKhoan: accountExist.recordset[0].taiKhoan,
+                    }
+                    break
                 default: // sinh viên
                     res.status(415).send("không tìm thấy role của bạn...!!!");
                     break;
             }
+            
             res.json(userDetail)
 
         } else {
@@ -139,4 +183,79 @@ module.exports.Login = async function (req, res) {
 
 }
 
+module.exports.getNotifyByAccount = async function (req, res) {
 
+    try {
+        let pool = await sql.connect(config);
+
+        let Notifycations = await pool.request().query(`SELECT * from dbo.ThongBao where NguoiNhanTB = '${req.params.taiKhoan}' and tinhTrangTB = 0 ORDER BY ngayTaoTB desc`);
+        res.json(Notifycations.recordset)
+    }
+    catch (error) {
+        console.log(error);
+    }
+
+}
+
+module.exports.markReadNotifyByAccount = async function (req, res) {
+
+    try {
+
+
+        let query = (`update dbo.ThongBao set tinhTrangTB = 1 where NguoiNhanTB = '${req.params.taiKhoan}' 
+        and tinhTrangTB = 0`);
+        await sql.connect(config).then(() => {
+            sql.query(query)
+                .then(result => {
+                    res.status(200).send("Xong.");
+                }).catch(err => {
+                    res.status(415).send("Bad!!!");
+                });
+        })
+    }
+    catch (error) {
+        console.log(error);
+    }
+
+}
+module.exports.conFirmAccountByAdmin = async function (req, res) {
+
+    try {
+        let pool = await sql.connect(config);
+
+        let data = req.body;
+
+
+
+        let query = `update taiKhoan set tinhTrang = 1 , ngayDuyet = getDate() 
+        where `;
+
+        let index = data.length - 1;
+
+        while (index >= 0) {
+
+            if (index == 0) {
+                query += `taiKhoan = '${data[index]}'`
+            } else {
+                query += `taiKhoan = '${data[index]}' or `
+
+            }
+            index--;
+
+        }
+
+        console.log(query)
+        await sql.connect(config).then(() => {
+            sql.query(query)
+                .then(result => {
+                    res.status(200).send("Duyệt thành công.");
+                }).catch(err => {
+                    res.status(415).send("Duyệt thất bại!!!");
+                });
+        })
+    }
+    catch (error) {
+        console.log(error);
+    }
+
+}
